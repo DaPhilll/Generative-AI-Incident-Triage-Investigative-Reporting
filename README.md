@@ -1,3 +1,5 @@
+[![Darreon Phillips Homepage](https://img.shields.io/badge/Darreon%20Phillips-Homepage-blue?style=for-the-badge&logo=github&logoColor=white)](https://github.com/DaPhilll)
+
 # Generative AI Incident Triage & Investigative Reporting
 
 ## 1. Executive Summary & Objective
@@ -101,7 +103,7 @@ def generate_incident_report(cleaned_log):
 ### Main Pipeline Invocation & Execution Boundary
 ```bash
 # Export the cryptographically isolated token payload to the environment context
-export GEMINI_API_KEY="AIzaSyXXXXXXXXXXXXXXXXXXXXXXXX"
+export GEMINI_API_KEY="XXXXXXXXXXXXXXXXXXXXXXXXXXX"
 
 # Execute the primary processing engine passing the target raw alert block
 python main_triage.py --log ./sample_alerts/wazuh_alert_1.json --output ./reports/
@@ -125,7 +127,6 @@ python main_triage.py --log ./sample_alerts/wazuh_alert_1.json --output ./report
 ```
 
 ### Standardized Compliance Markdown Output File (`Incident_Report_INC001.md`)
-```markdown
 ### Executive Summary
 At 2026-07-02T14:22:00Z, the SIEM detected a PowerShell execution policy bypass originating from endpoint DESKTOP-492. The process initiated an external network connection to a known malicious IP address, indicating a likely payload staging attempt.
 
@@ -142,3 +143,7 @@ At 2026-07-02T14:22:00Z, the SIEM detected a PowerShell execution policy bypass 
 1. Execute immediate network isolation on DESKTOP-492 via EDR.
 2. Block destination IP 103[.]15[.]22[.]88 at the perimeter firewall.
 3. Initiate an anti-malware scan on the affected endpoint to locate dropped payloads.
+'''
+
+<br><br><br>
+[![Darreon Phillips Homepage](https://img.shields.io/badge/Darreon%20Phillips-Homepage-blue?style=for-the-badge&logo=github&logoColor=white)](https://github.com/DaPhilll)
