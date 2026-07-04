@@ -2,6 +2,18 @@
 
 # Generative AI Incident Triage & Investigative Reporting
 
+## Repository Structure
+```
+/sample_alerts
+  example_alert.json
+log_parser.py
+ai_triage_engine.py
+main_triage.py
+requirements.txt
+LICENSE
+README.md
+```
+
 ## 1. Executive Summary & Objective
 * **Problem Statement:** During high-severity incidents, Tier 1 and Tier 2 analysts spend disproportionate time parsing inconsistent log formats and drafting reports, which slows response and produces documentation that varies by analyst.
 * **Solution Overview:** This project is a Python pipeline that sends parsed security logs to the Gemini API (`gemini-3.5-flash`, extended thinking enabled) and returns a structured, compliance-formatted incident summary, reducing the manual drafting step without removing analyst review.
@@ -12,7 +24,7 @@
   * Output formatted as an incident report.
 
 ## 2. Architecture & Environment Topology
-The pipeline consumes telemetry produced by the shared lab environment (VirtualBox, `10.10.0.0/24`), specifically Wazuh alerts from `SRV-SOC01` and Suricata events from the IDS node. It runs on the same Ubuntu host.
+The pipeline consumes telemetry produced by the shared lab environment (VMware Workstation Pro, `10.10.0.0/24`), specifically Wazuh alerts from `SRV-SOC01` and Suricata events from the IDS node. It runs on the same Ubuntu host.
 
 * **Execution Runtime:** Python 3.x, using the official `google-genai` SDK.
 * **Ingestion Source:** JSON output from Wazuh and security event logs.
@@ -46,7 +58,8 @@ The pipeline consumes telemetry produced by the shared lab environment (VirtualB
 
 ## 7. Implementation & Code
 
-### Log Parsing & Field Extraction (`log_parser.py`)
+### Log Parsing & Field Extraction
+`log_parser.py`
 ```python
 import json
 
@@ -64,7 +77,8 @@ def load_and_clean_log(file_path):
     return json.dumps(cleaned_log)
 ```
 
-### Prompting & Model Call (`ai_triage_engine.py`)
+### Prompting & Model Call
+`ai_triage_engine.py`
 ```python
 import os
 from google import genai
@@ -96,6 +110,41 @@ def generate_incident_report(cleaned_log):
     return response.text
 ```
 
+### CLI Entry Point
+`main_triage.py` — ties the two modules above together and writes the model's output to a report file.
+```python
+import argparse
+import os
+
+from log_parser import load_and_clean_log
+from ai_triage_engine import generate_incident_report
+
+def main():
+    parser = argparse.ArgumentParser(description="Generate an incident triage report from a security log.")
+    parser.add_argument("--log", required=True, help="Path to the raw log JSON file.")
+    parser.add_argument("--output", required=True, help="Directory to write the generated report to.")
+    args = parser.parse_args()
+
+    if not os.getenv("GEMINI_API_KEY"):
+        raise SystemExit("GEMINI_API_KEY is not set in the environment.")
+
+    os.makedirs(args.output, exist_ok=True)
+
+    cleaned_log = load_and_clean_log(args.log)
+    report_text = generate_incident_report(cleaned_log)
+
+    log_basename = os.path.splitext(os.path.basename(args.log))[0]
+    output_path = os.path.join(args.output, f"Incident_Report_{log_basename}.md")
+
+    with open(output_path, "w") as f:
+        f.write(report_text)
+
+    print(f"Report written to {output_path}")
+
+if __name__ == "__main__":
+    main()
+```
+
 ## 8. Pipeline Run Example
 The log entry, IPs, and output below are lab-generated and demonstrate the pipeline's input and output format.
 
@@ -106,6 +155,7 @@ python main_triage.py --log ./sample_alerts/example_alert.json --output ./report
 ```
 
 ### Sample Input Log
+`sample_alerts/example_alert.json`
 ```json
 {
   "timestamp": "2025-04-11T14:22:00Z",
@@ -147,6 +197,16 @@ At 2025-04-11T14:22:00Z, the SIEM detected a PowerShell execution policy bypass 
 * **Future Roadmap:**
   * [ ] Add a structured output schema (JSON mode) to make report fields easier to validate programmatically.
   * [ ] Benchmark report accuracy against analyst-written reports on a held-out set of lab incidents.
+
+## Dependencies
+Install script dependencies with:
+```bash
+pip install -r requirements.txt
+```
+See `requirements.txt` for exact versions.
+
+## License
+MIT — see [LICENSE](./LICENSE).
 
 <br><br><br>
 [![Darreon Phillips Homepage](https://img.shields.io/badge/Darreon%20Phillips-Homepage-blue?style=for-the-badge&logo=github&logoColor=white)](https://github.com/DaPhilll)
