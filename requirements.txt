@@ -1,1 +1,4 @@
-google-genai>=0.3.0
+# The 0.x and 1.x releases predate Gemini 3 and have no ThinkingLevel support,
+# so thinking_level and the gemini-3.x model names both fail on them.
+# Verified against 2.14.0.
+google-genai>=2.0.0
