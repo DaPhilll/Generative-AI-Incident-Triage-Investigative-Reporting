@@ -52,9 +52,12 @@ The pipeline consumes telemetry produced by the shared lab environment (VMware W
 
 ## 6. Model Used
 * **Model:** Google Gemini 3.5 Flash (GA).
-* **Reasoning Control:** `thinking_level="high"` set in the generation config to maximize reasoning depth on multi-step log correlation.
+* **Reasoning Control:** `thinking_level="high"` set in the generation config to maximize reasoning depth on multi-step log correlation. This parameter replaced the older numeric `thinking_budget` for Gemini 3.x models; the two cannot be combined in the same request.
+* **SDK Requirement:** `google-genai` 2.0 or later. The 0.x and 1.x releases predate Gemini 3 and do not expose `ThinkingLevel`, so both the model name and the reasoning parameter fail on them.
 
-*Note: The Gemini API has since introduced a newer Interactions API. The code below reflects the `generate_content` structure used when this project was built.*
+**Model currency:** Google released `gemini-3.6-flash` on July 21, 2026, which now serves as the default Flash model and carries a lower output-token price than 3.5 Flash. This project targets `gemini-3.5-flash`, which remains generally available. Moving to 3.6 Flash is a one-line change but should be re-validated against sample alerts before adoption, since reasoning behavior differs between generations.
+
+*Note: The Gemini API has since introduced a newer Interactions API for multi-agent orchestration. The code below reflects the `generate_content` structure used when this project was built, which remains supported.*
 
 ## 7. Implementation & Code
 
@@ -197,6 +200,8 @@ At 2025-04-11T14:22:00Z, the SIEM detected a PowerShell execution policy bypass 
 * **Future Roadmap:**
   * [ ] Add a structured output schema (JSON mode) to make report fields easier to validate programmatically.
   * [ ] Benchmark report accuracy against analyst-written reports on a held-out set of lab incidents.
+  * [ ] Evaluate `gemini-3.6-flash` against the current sample set, comparing report quality and token cost before switching.
+  * [ ] Track access to Gemini 3.5 Flash Cyber, a security-tuned variant of 3.5 Flash announced July 2026. It is currently limited to governments and trusted partners through CodeMender and is not on the public Developer API, so it is a watch item rather than an actionable dependency.
 
 ## Dependencies
 Install script dependencies with:
